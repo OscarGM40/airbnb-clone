@@ -1,0 +1,379 @@
+             AIRBNB CLONE
+
+Source: https://www.youtube.com/watch?v=c_-b_isI4vg&t=60s&ab_channel=CodeWithAntonio
+Repo: 
+
+Si bien ya se puede instalar Tailwind directamente con el starter(npx create-next-app --typescript) si quisiera agregarlo posteriormente tengo que instalar el postcss, el autoprefixer y el core:
+npm i tailwindcss autoprefixer postcss
+
+Despues debo crear dos files de configuracion(para el postcss y la lib propia) con:
+>npx tailwindcss init -p <- fijate en el apoyo sobre la lib
+
+El tailwind.config quedaría asi:
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+El postcss.config:
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+Y en el globals.css(el archivo global que use me traigo las medias para que se extiendan a la app verticalmente):
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+Obviamente este paso se puede ahorrar ya.
+NOTA: recuerda que Tailwind hace un normalize y no necesito quitar margénes o paddings del browser si uso este fwk.
+
+      NUEVA ESTRUCTURA DE ARCHIVOS/RUTAS
+
+Siempre que quiera crear una ruta tengo que crear un file(y llamarlo page.js ??) en app.Esta ubicación es la clave para Next:
+
+app/page.tsx <- es la /
+app/dashboard/page.tsx <- será /dashboard
+app/carpeta/page.tsx <- la url será /carpeta
+
+De forma similar si llamo a un file 'layout.js' será un layout (los layouts preservan el estado,no se re-renderizan y los componentes que lo formen permanecen interactivos)
+Para definir uno simplemente tengo que exportar por defecto(ojo con esto) un componente de React que debe aceptar una prop children a popular con un child layout o una child page:
+
+En app/dashboard/layout.js
+export default function DashboardLayout({
+  children, // <- será una page o un sublayout,solo eso puede ser
+  }:{children:React.ReactNode}){
+    return(
+      <section>
+        <nav></nav> <- aqui iría todo lo común a éste layout
+      {children} <- son las props,asinto
+      </section>
+    )
+  }
+
+NOTA: el Layout más arrib en el árbol ya me viene dado y obviamente está en app/layout.js. Éste layout tiene que llevar las etiquetas html y body(que se llame RootLayout es una convención):
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      {/* <body className={inter.className}>{children}</body> */}
+      <body className={font .className}>
+        <Navbar />
+        {children}
+      </body>
+    </html>
+  )
+}
+
+IMPORTANTE: todo componente de React que cree en el folder app es un server rendered component.Esto puede derivar en problemas de hidratación(por ejemplo al mezclar imports para back y front).Debo declarar los componentes que sean de front simplemente poniendo en la primera linea el literal 'use client'.Ejemplo del Container.tsx:
+
+'use client';
+
+interface IContainerProps{
+  children: React.ReactNode;
+}
+const Container = ({children}:IContainerProps) => {
+  return (
+  <div>{children}</div>
+  )
+}
+export default Container
+
+TIP: este componente simplemente pinta el contenido de la Navbar,es algo que ya sabe que va a quedar en el front,por eso lo marca
+
+NOTA: vamos a instalar la libreria react-icons para los iconos
+También vamos a instalar axios y react-hook-form, y para las notificaciones usaremos 'react-hot-toast';
+
+NOTA: transform origin debe usarse junto a la propiedad transform.Ejemplo
+div {
+  transform: rotate(45deg);
+  transform-origin: 20% 40%; <- son los ejes Y e X respectivamente(luego  primero lo sube y despues desplaza a la dcha)
+}
+
+Toda esta parte es pura maquetación,a destacar la reusabilidad del botón,input y modal, totalmente destacable.
+
+        1H 35M SETTING UP PRISMA AND MONGODB
+
+Lo primero va a ser instalar Prisma(en desarrollo):
+>npm i -D prisma
+A continuación hay inicializar la libreria:
+>npx prisma init
+
+Fijate que esto va a crear dos files, el .env con un ejemplo de cadena de conexión y un schema.prisma tmb con datos de ejemplo.Por defecto se está enganchando a PostGre:
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+Reemplazamos el provider a 'mongodb'.La propiedad url apunta correctamente al env y la variable de entorno correcta,pero el valor obviamente tiene que ser una MongoURI correcta
+
+Fijate en la sintaxis de los modelos de Prisma, y como al tener el social login activado no puedo obligar al usuario a que meta campos como el name o la password.
+Dado que usa SQL tendré que especificar relaciones,foreign keys,etc.Super interesante
+
+model User {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId // mapeo de id a MongoObjectId
+  name           String?
+  email          String?       @unique // la ? es si es opcional
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  favoritesIds   String[]      @db.ObjectId
+  // relaciones
+  accounts       Account[] //relacion con otro modelo
+  listings       Listing[]
+  reservations   Reservation[]
+}
+
+// Account debe hacer match con los campos del Social Login pues representa eso
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId]) <- la combinación debe de ser única,pero no cada campo por separado.De nuevo superútil
+}
+
+Simplemente seguir el video.Fijate que este ORM parece buenísimo.
+
+1h 50 una vez con el DDL creado falta subirlo en este caso a MongoAtlas.Hay que usar el comando(npx prisma db push)
+>npx prisma db push
+
+Esto creará las collections y relations y sincronizará los indices.
+
+      1H 51 NEXT AUTH
+
+Para la autenticación vamos a instalar el modulo next/auth y los drivers/adapters necesarios:
+npm install next-auth @prisma/client @next-auth/prisma-adapter
+
+También vamos a usar bcrypt para las passwords(además de sus tipos):
+npm install bcrypt
+npm install -D @types/bcrypt
+
+NOTA: NextAuth no soporta el uso de la estructura "app/api" aún, y tenemos que crear el antigüo file pages/api/auth/[...nextauth].ts
+
+Creo el archivo según video/documentación.Lo siguiente va a ser crear el endpoint de registro.Desde Next 13 tengo que crear un archivo llamado route.ts donde necesite(siempre dentro de app/api).DAdo que queremos que el endpoint apunte a /register =>
+
+En el app/api/register/route.ts:
+
+import bcrypt from 'bcrypt';
+import prisma from '@/app/libs/prismadb';
+import { NextResponse } from 'next/server';
+
+export async function POST(request:Request){
+  const body = await request.json();
+  const { email, name, password } = body;
+
+  const hashedPassword = await bcrypt.hash(password,12);
+  const user = await prisma.user.create({
+    data:{email,name,hashedPassword}
+  })
+
+  return NextResponse.json(user); // similar a res.json()
+}
+
+Fijate en el uso del nombre de la función para identificar el método,muy interesante el cambio para no tener que hacer ese switch
+
+2h 31m : puedo remodelar cualquier type existente con la siguiente sintaxis:
+
+export type SafeUser = Omit<User,"createdAt"|"updatedAt"> & {
+  createdAt: string;
+  updatedAt: string;
+}
+
+SOCIAL LOGINS: Para habilitar la OAuth de Github simplemente voy a los Settings de mi cuenta(ojo, no los del repositorio,los de mi cuenta que están en mi avatar) y alli voy a developer settings y creo una nueva app,etc.Ya me darán los tokens.Despues es simplemente llamar a signIn('github') tanto en el login como en el register
+
+Para crear un proyecto de Google ir a su consola,crearlo, rellenar la pantalla de consentimiento primero y despues habilitar las uris de redireccionamiento.
+
+NOTA: si me falla la fuente puedo borrar el directorio .next y volver a recrearlo(temas de caché diria yo)
+
+          2H 44 CATEGORIES UI
+
+Para esta parte vamos a instalar el paquete query-string, además de hacer uso del hook useSearchParams.Ojo,que es con un guion.
+Este paquete tiene 14 millones de descargas esta semana,y sirve para parsear y stringify URL query strings.Ejemplo:
+
+import qs from "query-string";
+
+teniendo el string location = '?foo=bar' =>
+const parsed = qs.parse(location)
+dará => {foo: 'bar}
+
+teniendo el string locationHashed = '@token=badatgksejglk';
+const parsedHash = qs.parse(locationHashed)
+dará => { token: 'bada-----'}
+Luego con parse descompongo el queryString a un objeto(el primer ? o # es ignorado,asi que puedo pasarlo directamente),pero esto no es todo,ya que hace lo contrario tmb:
+
+parsed.foo = 'unicorn';
+parsed.ilike= 'pizza';
+const stringified = qs.stringify(parsed);
+'foo=unicorn&ilike=pizza';
+O sea que va a barrer las keys de un object y ponerlas como string(ojo que no puso la interrogación inicial,no entiendo porque no)
+
+Ojo,también funciona con arrays,pero hay que pasarle que es un array:
+queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
+//=> {foo: ['1', '2', '3']}
+
+
+3h 16m Seguimos por la modal del onClick en el btn con el literal 'Airbnb your home'.
+3h 38 vamos a instalar el paquete 'world-countries' para algun multiselector de paises?
+TIP: fijate como un hook puede devolver lo que me dé la gana,solo funciones,funciones y propiedades,ni siquiera tienen que ser hooks de react:
+
+const useCountries = () => {
+  const getAll = () => formattedCountries;
+  const getByValue = (value:string) => formattedCountries.find(item => item.value === value);
+
+  return {
+    getAll,
+    getByValue,
+  }
+}
+
+export default useCountries;
+
+DDD: de forma simple se tratar de organizar mi aplicación en componentes modulares para dejar un codigo base escalable y mantenible.
+Con DDD estableceré limites claros y dominios bien definidos,permitiendome compartimentizar mi código de una manera que vaya perfectamente alineada con los requerimientos de mi aplicación(parece que la lógica de negocio manda)
+Con DDD la app no quedará solo funcional,sino que quedará altamente mantenible y escalable.
+Parece que hay que identificar y modelar los dominios core,de esta forma queda una aplicación que permitirá acomodar futuros cambios y expansiones
+Parece que incluso fomenta la colaboración entre desarrolladores e incrementa la productividad(lo dudo)
+También reduce regresiones y bugs,tmb lo dudo
+NOTA: el dominio es una ontologia(en informatica es una definición formal de tipos,propiedades y relaciones entre entidades)
+Diria que para poder usar dominios y DDD tienes que tener todo el contexto de la aplicación
+
+Cuando el diseño es domain-driven,significa que ponemos el modelo de nuetro dominio(por ejemplo una tarjeta de juego en el dominio de Poker) en un contexto(por ejemplo,en un contexto de agrupamiento,como un Game) para ayudar a manejar la complejidad
+
+Obviamente no tiene sentido usar DDD en una app con un modelo o dos.Sin embargo,desde un numero aproximado de 4 modelos,es buen momento para empezar a atar esos modelos a múltiples contextos.
+
+Tomemos como ejemplo Twitter, por ejemplo podriamos dividir nuestros modelos en dos contextos como Blog e Interaction.
+En Blog tendré los modelos de User y Tweet mientras que en Interaction tengo los modelos de Follow, Share y Like.
+Fijate que hay relaciones entre User e Interaction y User y Tweet o Tweet y Share o Tweet y Like
+TIP: esto es un ejemplo muy vago,pero nos sirve para entender porqué vamos a estructurar la app asi:
+
+twitter/
+|_ App.css
+|_ App.js
+|_ blog/ <- contexto
+|_ interaction/ <- contexto
+
+NOTA: debo definir los componentes y contenedores en cada dominio.Una vez claro esto podria empezar con algo como esto(incorrecto aún pues faltan los dominios).
+
+twitter/
+├── App.css
+├── App.js
+├── App.test.js
+├── blog/
+│   ├── HomePage.js
+│   ├── TweetCard.js
+│   ├── TweetDialog.js
+│   ├── TweetList.js
+│   ├── TweetListItem.js
+│   ├── UserPage.js
+│   └── UserCard.js
+└── interaction/
+    ├── FollowButton.js
+    ├── LikeButton.js
+    └── ShareButton.js
+
+Sin embargo me faltan los dominios,deberia ser algo como:
+twitter/
+└── blog/
+    ├── user/
+    │   ├── HomePage.js
+    │   ├── UserCard.js
+    │   └── UserPage.js
+    └── tweet/
+        ├── TweetCard.js
+        ├── TweetDialog.js
+        ├── TweetList.js
+        └── TweetListItem.js
+
+Puedo ver como blog es el contexto de agrupación,user es el dominio y de momento me quedo aqui,xd(investigar más)Al parecer usar DDD suele ser muy interpretable ya que a un desarrollador le pueden salir contextos y dominios diferentes.Sea como sea es muy interesante.
+Investigar que tiene que ver la arquitectura hexagonal con esto.
+
+3h54m: para los mapas vamos a usar leaflet.Necesitamos la libreria core,sus tipos y la implementación para react:
+npm i leaftet react-leaflet
+npm i -D @types/leaftet
+
+IMPORTANTE: fijate que él va a configurar esta libreria un poco diferente de Fernando.Si bien parece más rápido fijate que en el global.css hemos hardcodeado esto:
+
+import L from "leaflet";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css"; // importante traerme los estilos,asinto
+// fijate como si una libreria expone imagenes puedo acceder a ellas perfectamente
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+// @ts-ignore
+delete L.Icon.Default.prototype._getIconUrl;
+// basicamente está pisando los iconos por defecto(dice que no van bien)
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon.src,
+  iconRetinaUrl: markerIcon2x.src,
+  shadowUrl: markerShadow.src,
+});
+interface MapProps {
+  center?: number[];
+}
+const Map: React.FC<MapProps> = ({ center }) => {
+  return <MapContainer
+     center={(center as L.LatLngExpression) || [51, -0.09]}
+     zoom={ center ? 4 : 2}
+     scrollWheelZoom={false}
+     className="h-[35vh] rounded-lg"
+  ></MapContainer>;
+}
+
+4h05m: porqué no hacer un refactor de la red social a typescript?
+4h17m: Images Step: vamos a usar cloudinary.Dado que estoy en Next la libreria es 'next-cloudinary':
+>npm i next-cloudinary
+
+Fijate que fácil es enganchar cloudinary con upload_presets a unsigned,solo necesito mi cloud name.Realmente está demasiado abierto diria yo.Fijate tmb que estoy usando declare global en un componente de cliente
+
+TIP: fijate que cualquier funcion que declare async debo llamarla con async tmb:
+
+export async function utilityOne() {
+  return await prisma.listing.findMany({orderBy:{createdAt:"desc"}});
+}
+
+cuando la llame ahora:
+
+const listings = await utilityOne();
+
+Puedo memorizarlo como que los asyncs se pasan entre funciones ?? Esto es importante masterizarlo,asinto
+
+Ojo,Oscar, Omit<Type | interface,keys) me permite omitir/excluir las propiedades de un tipo o interface, no sólo de los tipos.Si que parece que me retorna un type forzosamente.Este truco va genial para establecer un nuevo type con una property o varias cambiadas:
+
+Aunque no tenga sentido podria tener dos tipos,este segundo con otros tipos para las propiedades que omitiera o directamente otras propiedades,desde luego esto es muy interesante.
+export type NewType = Omit<Type,'name' | 'username'> & {
+  name:number;
+  username: number
+}
+
+NOTA: fijate que al confundirme en un tipado de una propiedad del schema de prisma tuve que ejecutar 'npx prisma generate' para resincronizar los tipos(otra persona recomendaba usar npx prisma db pull, supongo que tras haber echo un npx prisma db push con el tipo cambiado podria valer tmb)
+
+5h17 making the heart button
