@@ -376,4 +376,120 @@ export type NewType = Omit<Type,'name' | 'username'> & {
 
 NOTA: fijate que al confundirme en un tipado de una propiedad del schema de prisma tuve que ejecutar 'npx prisma generate' para resincronizar los tipos(otra persona recomendaba usar npx prisma db pull, supongo que tras haber echo un npx prisma db push con el tipo cambiado podria valer tmb)
 
-5h17 making the heart button
+5h23 making the heart button: fijate como para hacer una ruta dinámica ahora en Next 13 simplemente es el folder el que va entre corchetes:
+
+/app
+|_favorites
+  |_[listingId]
+    |_route.ts
+
+Esta estructura corresponde a /app/favorites/:listingId
+
+Fijate que aparte de esto hay que sacar los params como segundo argumento(parece que simplemente si vienen unos params en la request en el método controlador tengo acceso a ellos como argumento final.Confirmar):
+
+interface IParams {
+  listingId?: string;
+}
+
+export async function POST(request: Request, { params }: { params: IParams }) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.error();
+  }
+
+  const { listingId } = params;
+
+  if (!listingId || typeof listingId !== "string") {
+    throw new Error("Invalid ID");
+  }
+
+  let favoriteIds = [...(currentUser.favoriteIds || [])];
+  favoriteIds.push(listingId);
+
+  const user = await prisma.user.update({
+    where: {
+      id: currentUser.id,
+    },
+    data: {
+      favoriteIds: favoriteIds,
+    },
+  });
+  return NextResponse.json(user);
+}
+
+
+Fijate el hook que se ha montado, desde luego tiene pinta de ser interesante hacer hooks asi,habría que ver en un entorno empresarial si falta algo o es acertado este approach:
+
+
+const useFavorite = ({ listingId, currentUser }: IUseFavorite) => {
+  const router = useRouter();
+  const loginModal = useLoginModal();
+
+  const hasFavorited = useMemo(() => {
+    const list = currentUser?.favoriteIds || [];
+    return list.includes(listingId);
+  }, [currentUser?.favoriteIds, listingId]);
+
+  const toggleFavorite = useCallback(
+    async (e: React.MouseEvent<HTMLDivElement>) => {
+      // fijate que si la imagen padre contenedora tuviera algun evento es necesario parar la propagacion hacia arriba del hijo
+      e.stopPropagation();
+      // si no hubiera usuario y queremos dar like abrimos la modal para que se logueen
+      if (!currentUser) {
+        return loginModal.onOpen();
+      }
+
+      try {
+        let request;
+        // fijate que approach tan interesante
+        if (hasFavorited) {
+          request = () => axios.delete(`/api/favorites/${listingId}`);
+        } else {
+          request = () => axios.post(`/api/favorites/${listingId}`);
+        }
+        await request();
+        router.refresh();
+        toast.success(`Success`);
+      } catch (error) {
+        toast.error(`Something went wrong.`);
+      }
+    },
+    [currentUser, loginModal, listingId, hasFavorited, router],
+  );
+
+  return {
+    hasFavorited,
+    toggleFavorite
+  }
+};
+
+export default useFavorite;
+
+Fijate tmb que en la llamada pasarle el listingId y el user hace decantar la balanza:
+  const { hasFavorited, toggleFavorite } = useFavorite({ listingId, currentUser });
+Desde luego hay que usar más hooks, siempre debimos haber usado más
+Nota tmb como ha mandado un objeto y no dos args.Este tio es muy bueno.
+
+NOTA: no hay exports por default en los nuevos route handlers,ojo
+
+5h43m: de igual manera que he creado una ruta dinámica para un route handler tengo que hacer lo mismo para un componente.En este caso nos referimos a /listings/:listingId(la pagina del detalle de un alojamiento)
+
+TIP: fijate tmb que estos page.tsx son server components(todo componente lo es por defecto).Esto me va a permitir acceder automáticamente a los params,ya que necesitaré el segmento dinámico con el Id(desde luego es otra feature importante):
+
+interface IParams {
+  listingId?: string;
+}
+// IMPORTANTISIMO: dado que esto es un server component tengo acceso a los params por la face,en cuanto lo marque como "use client" ya no podria hacer lo mismo.Fijate que es un objeto y que supongo que siempre va el último argumento,pero como no hay más aqui es el primero
+const ListingPage = async ({ params }: { params: IParams }) => {
+
+  const listing = await getListingById(params);
+
+  return <div></div>;
+};
+
+export default ListingPage;
+
+Fijate que el server component lo he podido hacer asincrono, yque todos los client component no hay ni uno asincrono(importante ver que los server components pueden ser asincronos).Diria que los client components ya son asincronos por naturaleza,no parece importante.
+
+6h 07m

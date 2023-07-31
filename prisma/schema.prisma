@@ -21,7 +21,7 @@ model User {
   hashedPassword String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt // especial buit-in object
-  favoritesIds   String[]      @db.ObjectId
+  favoriteIds   String[]      @db.ObjectId
   // relaciones
   accounts       Account[] //relacion con otro modelo
   listings       Listing[]

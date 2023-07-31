@@ -1,6 +1,6 @@
 "use client";
 import Container from "../shared/Container";
-import { TbBeach,TbMountain,TbPool } from "react-icons/tb";
+import { TbBeach, TbMountain, TbPool } from "react-icons/tb";
 import { IoDiamond } from "react-icons/io5";
 import {
   GiWindmill,
@@ -13,12 +13,18 @@ import {
   GiBarn,
 } from "react-icons/gi";
 import { MdOutlineVilla } from "react-icons/md";
-import { FaSkiing  } from 'react-icons/fa';
-import { BsSnow } from 'react-icons/bs';
+import { FaSkiing } from "react-icons/fa";
+import { BsSnow } from "react-icons/bs";
 import CategoryBox from "../shared/CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
+import { IconType } from "react-icons";
 
-export const categories = [
+export type Category = {
+  label: string;
+  icon: IconType;
+  description: string;
+};
+export const categories: Category[] = [
   {
     label: "Beach",
     icon: TbBeach,
@@ -98,11 +104,11 @@ export const categories = [
 
 const Categories = () => {
   const params = useSearchParams();
-  const category = params?.get('category');
+  const category = params?.get("category");
   const pathname = usePathname();
   const isMainPage = pathname === "/";
 
-  if(!isMainPage){
+  if (!isMainPage) {
     return null;
   }
 
@@ -125,7 +131,6 @@ const Categories = () => {
             description={item.description}
             icon={item.icon}
             selected={item.label === category}
-
           />
         ))}
       </div>
