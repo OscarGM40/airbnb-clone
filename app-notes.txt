@@ -492,4 +492,38 @@ export default ListingPage;
 
 Fijate que el server component lo he podido hacer asincrono, yque todos los client component no hay ni uno asincrono(importante ver que los server components pueden ser asincronos).Diria que los client components ya son asincronos por naturaleza,no parece importante.
 
-6h 07m
+6h 07m: fijate que vamos a necesitar traer dinámicamente el import del Map, y que lo pone arriba del todo(al final es un simple import que se almacena en una constante).Esta vez parece que no hace falta que el import cambie segun una dependencia:
+
+"use client";
+import { SafeUser } from "@/app/types";
+import { Category } from "../navbar/Categories";
+import useCountries from "@/app/hooks/useCountries";
+import Avatar from "../shared/Avatar";
+import ListingCategory from "./ListingCategory";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import("../shared/Map"),{ssr:false});
+
+interface ListingInfoProps {
+  user: SafeUser | null;
+  description: string;
+  category?: Category;
+  roomCount: number;
+  guestCount: number;
+  bathroomCount: number;
+  locationValue: string;
+}
+const ListingInfo: React.FC<ListingInfoProps> = ({
+  user,
+  description,
+  category,
+  roomCount,
+  guestCount,
+  bathroomCount,
+  locationValue,
+}) => {
+  const { getByValue } = useCountries();
+  const coordinates = getByValue(locationValue);
+
+Tus pensamientos no te definen,tus actos si.
+6h40m
