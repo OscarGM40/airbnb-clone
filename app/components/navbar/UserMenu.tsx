@@ -8,12 +8,13 @@ import { AiOutlineMenu } from "react-icons/ai";
 import Avatar from "../shared/Avatar";
 import MenuItem from "./MenuItem";
 import useRentModal from "@/app/hooks/useRentModal";
+import { useRouter } from "next/navigation";
 
 interface UserMenuProps {
   currentUser?: User | null;
 }
 const UserMenu = ({ currentUser }: UserMenuProps) => {
-
+  const router = useRouter();
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
@@ -54,7 +55,7 @@ const UserMenu = ({ currentUser }: UserMenuProps) => {
           <div className="flex flex-col cursor-pointer">
             {currentUser ? (
               <>
-                <MenuItem onClick={() => null} label="My trips" />
+                <MenuItem onClick={() => router.push(`/trips`)} label="My trips" />
                 <MenuItem onClick={() => null} label="My favorites" />
                 <MenuItem onClick={() => null} label="My reservations" />
                 <MenuItem onClick={() => null} label="My properties" />

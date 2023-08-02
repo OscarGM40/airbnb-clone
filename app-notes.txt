@@ -525,5 +525,48 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   const { getByValue } = useCountries();
   const coordinates = getByValue(locationValue);
 
-Tus pensamientos no te definen,tus actos si.
-6h40m
+Tus pensamientos no te definen,tus actos si.Eres una persona que tiene un diálogo interno superfuerte,tienes que tener en cuenta esto siempre
+
+6h45m: fijate como hay que usar la propiedad 'create' para popular una entidad relacionada(en este caso reservations en una listing):
+
+  const listingAndReservation = await prisma.listing.update({
+    where: {
+      id: listingId,
+    },
+    data: {
+      reservations: {
+        create: {
+          userId: currentUser.id,
+          totalPrice,
+          startDate,
+          endDate,
+        },
+      },
+    },
+  });
+
+Tmb vamos a sanear las reservas por los Date:
+  const safeReservations = reservations.map((reservation) => ({
+      ...reservation,
+      createdAt: reservation.createdAt.toISOString(),
+      startDate: reservation.startDate.toISOString(),
+      endDate: reservation.endDate.toISOString(),
+      listing: {
+        ...reservation.listing,
+        createdAt: reservation.listing.createdAt.toISOString(),
+      },
+    }));
+    return safeReservations;
+
+
+Y esto nos obligará a crear otro Safe Type,
+// fijate como reservation.listing tenemos que sanearla tmb
+export type SafeReservation = Omit<Reservation, "createdAt" | "startDate" | "endDate" | "listing"> & {
+  createdAt: string;
+  startDate: string;
+  endDate: string;
+  listing: SafeListing
+};
+
+echo "15.8" de separación entre la tv y la plataforma.Eres ambicioso, no envidioso.Tienes que tener claro más cosas,asinto.No esperabas una tia guay, te lo compro,pero mejor disfrutar de ello,asin
+7h10m
