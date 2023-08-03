@@ -26,23 +26,24 @@ const UserMenu = ({ currentUser }: UserMenuProps) => {
   }, []);
 
   const onRent = useCallback(() => {
-    if(!currentUser){
-     return loginModal.onOpen();
+    if (!currentUser) {
+      return loginModal.onOpen();
     }
-    rentModal.onOpen()
-  },[loginModal,currentUser,rentModal])
-  
+    rentModal.onOpen();
+  }, [loginModal, currentUser, rentModal]);
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
         <div
-        onClick={onRent}
-        className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
+          onClick={onRent}
+          className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+        >
           Airbnb your home
         </div>
         <div
           onClick={toggleOpen}
-          className="p-4 md:py-1 md:px-2 border-[1px] border-neutral -200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition"
+          className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition"
         >
           <AiOutlineMenu />
           <div className="hidden md:block">
@@ -51,16 +52,16 @@ const UserMenu = ({ currentUser }: UserMenuProps) => {
         </div>
       </div>
       {isOpen && (
-        <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm">
+        <div className="absolute rounded-xl shadow-md w-[40vw] md:w-full bg-white overflow-hidden right-0 top-12 text-sm">
           <div className="flex flex-col cursor-pointer">
             {currentUser ? (
               <>
                 <MenuItem onClick={() => router.push(`/trips`)} label="My trips" />
-                <MenuItem onClick={() => null} label="My favorites" />
-                <MenuItem onClick={() => null} label="My reservations" />
+                <MenuItem onClick={() => router.push(`/favorites`)} label="My favorites" />
+                <MenuItem onClick={() => router.push("/reservations")} label="My reservations" />
                 <MenuItem onClick={() => null} label="My properties" />
-                <MenuItem onClick={rentModal.onOpen} label="Airbnb my home" />
-                <hr />  
+                <MenuItem onClick={rentModal.onOpen} label="Airbnb my home (Register a property)" />
+                <hr />
                 <MenuItem onClick={() => signOut()} label="Logout" />
               </>
             ) : (

@@ -569,4 +569,33 @@ export type SafeReservation = Omit<Reservation, "createdAt" | "startDate" | "end
 };
 
 echo "15.8" de separación entre la tv y la plataforma.Eres ambicioso, no envidioso.Tienes que tener claro más cosas,asinto.No esperabas una tia guay, te lo compro,pero mejor disfrutar de ello,asin
-7h10m
+
+7h10m: fijate como recalca Antonio que no debo preocuparme por la lentitud en algunas redirecciones en desarrollo en Next.En producción todo estará ya compilado
+
+7h35m: para la ruta de las listings favorites de un user simplemente necesitamos el currentUser.id(fijate la similitud con Mongoose):
+
+export default async function getFavoriteListings(){
+  try {
+    const currentUser = await getCurrentUser();
+    if(!currentUser){
+      return [];
+    }
+    const favorites = await prisma.listing.findMany({
+      where:{
+        id:{
+          in: [...(currentUser.favoriteIds || [])]
+        }
+      }
+    })
+
+    const safeFavorites = favorites.map((favorite) => ({
+      ...favorite,
+      createdAt: favorite.createdAt.toISOString(),
+    }))
+    return safeFavorites;
+  } catch (error:any) {
+    throw new Error(error)
+  }
+}
+
+7h40m
