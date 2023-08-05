@@ -1,16 +1,77 @@
 import prisma from "@/app/libs/prismadb";
 
 export interface IListingsParams {
-    userId?: string;
+  userId?: string;
+  guestCount?: number;
+  roomCount?: number;
+  bathroomCount?: number;
+  startDate?: string;
+  endDate?: string;
+  locationValue?: string;
+  category?: string;
 }
 
-export default async function getListings(params:IListingsParams) {
+export default async function getListings(params: IListingsParams) {
   try {
-    const { userId } = params;
+    const {
+      userId,
+      guestCount,
+      roomCount,
+      bathroomCount,
+      startDate,
+      endDate,
+      locationValue,
+      category,
+    } = params;
     let query: any = {};
 
-    if(userId){
+    if (userId) {
       query.userId = userId;
+    }
+    if (category) {
+      query.category = category;
+    }
+
+    if (roomCount) {
+      query.roomCount = {
+        gte: +roomCount,
+      };
+    }
+
+    if (bathroomCount) {
+      query.bathroomCount = {
+        gte: +bathroomCount,
+      };
+    }
+
+    if (guestCount) {
+      query.guestCount = {
+        gte: +guestCount,
+      };
+    }
+
+    if (locationValue) {
+      query.locationValue = locationValue;
+    }
+
+    if (startDate && endDate) {
+      // que no haya reservas con la fecha final mayor a la que pasamos y la inicial menor(pues no podemos reservar).Ni que haya reservas con la fecha inicial menor a la que le pasamos ni la final mayor a la que le pasamos.En resumen,que no haya un dia ya reservado en el rango que pasemos
+      query.NOT = {
+        reservations: {
+          some: {
+            OR: [
+              {
+                endDate: { gte: startDate },
+                startDate: { lte: startDate },
+              },
+              {
+                startDate: { lte: endDate },
+                endDate: { gte: endDate },
+              },
+            ],
+          },
+        },
+      };
     }
 
     const listings = await prisma.listing.findMany({
@@ -19,10 +80,12 @@ export default async function getListings(params:IListingsParams) {
         createdAt: "desc",
       },
     });
+
     const safeListings = listings.map((listing) => ({
       ...listing,
-      createdAt: listing.createdAt.toISOString()
-    }))
+      createdAt: listing.createdAt.toISOString(),
+    }));
+
     // return listings;
     return safeListings;
   } catch (error: any) {

@@ -24,7 +24,7 @@ const Home = async ({ searchParams }: HomeProps) => {
       </ClientOnly>
     );
   }
-
+  
   return (
     <ClientOnly>
       {/* es un simple centrador,gran idea de nuevo */}

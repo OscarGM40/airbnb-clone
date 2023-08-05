@@ -10,6 +10,7 @@ import qs from "query-string";
 import { formatISO } from "date-fns";
 import Heading from "../shared/Heading";
 import Calendar from "../inputs/Calendar";
+import Counter from "../inputs/Counter";
 
 enum STEPS {
   LOCATION = 0,
@@ -80,8 +81,8 @@ const SearchModal = () => {
       { skipNull: true },
     );
     setStep(STEPS.LOCATION);
-    searchModal.onClose();
     router.push(url);
+    searchModal.onClose();
   }, [
     step,
     params,
@@ -121,17 +122,40 @@ const SearchModal = () => {
       <Map center={location?.latlng} />
     </div>
   );
-  
-  if(step === STEPS.DATE){
+
+  if (step === STEPS.DATE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading title="When do you plan to go" subtitle="Make sure everyone is free!" />
-          <Calendar 
-            value={dateRange}
-            onChange={(value) => setDateRange(value.selection)}
-          />
+        <Calendar value={dateRange} onChange={(value) => setDateRange(value.selection)} />
       </div>
-    )
+    );
+  }
+
+  if (step === STEPS.INFO) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading title="More information" subtitle="Find your perfect place!" />
+        <Counter
+          title="Guests"
+          subtitle="How many guests are coming?"
+          value={guestCount}
+          onChange={(value) => setGuestCount(value)}
+        />
+        <Counter
+          title="Rooms"
+          subtitle="How many rooms do you need?"
+          value={roomCount}
+          onChange={(value) => setRoomCount(value)}
+        />
+        <Counter
+          title="Bathrooms"
+          subtitle="How many bathrooms do you need?"
+          value={bathroomCount}
+          onChange={(value) => setBathroomCount(value)}
+        />
+      </div>
+    );
   }
   return (
     <Modal

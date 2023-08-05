@@ -652,4 +652,71 @@ const onSubmit = useCallback(async () => {
 
 Bravo, más fácil imposible.
 
-8h12m making the last step of SearchModal
+8h24m: si voy al directorio principal app veré que tengo dos archivos llamados layout.tsx y app.tsx.Aparte de estos dos nombres reservados también tengo error.tsx y loading.tsx asi que vamos a crear los loadings.
+De momento empezamos con el principal que obviamente irá en app/loading.tsx.Instalaremos una libreria que trae loaders muy guapos:
+npm i react-spinners
+
+import Loader from "./components/shared/Loader";
+
+const Loading = () => {
+  return (
+    <Loader />
+  )
+}
+
+export default Loading;
+
+"use client";
+import { PuffLoader } from "react-spinners";
+
+const Loader = () => {
+  return (
+    <div className=" h-[70vh] flex flex-col justify-center items-center ">
+      <PuffLoader size={100} color="red" />
+    </div>
+  );
+};
+export default Loader;
+
+Fijate que se propagó a toda la app.Puede ser lo que se quiera eventualmente(supongo que un listing/loading.tsx va a pisar a app/loading.tsx ).
+Para el error nos va a valer con un app/error.tsx(en minusculas) y marcarlo como client component:
+"use client";
+
+import { useEffect } from "react";
+import EmptyState from "./components/shared/EmptyState";
+
+interface ErrorStateProps {
+  error: Error;
+}
+const ErrorState: React.FC<ErrorStateProps> = ({ error }) => {
+  useEffect(() => {
+    console.log({ error });
+  }, [error]);
+
+  return (
+    <EmptyState
+      title="Ups"
+      subtitle="Something went wrong( check the console.log.This is a client component) "
+    />
+  );
+};
+export default ErrorState;
+
+      PROTECCION DE RUTAS
+8h36: tmb parece importante crear un file llamado middleware.ts(que estará afuera de app) para que no entren por la URL
+
+En /middleware.ts (en matcher pongo todas las rutas a proteger)
+export { default } from 'next-auth/middleware';
+
+export const config = {
+  matcher:[
+    "/trips",
+    "/reservations",
+    "/properties",
+    "/favorites",
+  ]
+}
+Si ahora intento a ir a /properties veré que me redirecionan a la home =>
+http://localhost:3000/?callbackUrl=http%3A%2F%2Flocalhost%3A3000%2Fproperties
+
+Antes de desplegar ejecutar 'npm run lint'.Recuerda no poner nada de airbnb en el dominio de la app para que la cataloguen como phising
