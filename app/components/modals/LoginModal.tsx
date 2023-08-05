@@ -9,8 +9,8 @@ import { toast } from "react-hot-toast";
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import Input from "../inputs/Input";
-import Button from "../shared/Button";
-import Heading from "../shared/Heading";
+import Button from "../Button";
+import Heading from "../Heading";
 import Modal from "./Modal";
 
 const LoginModal = () => {

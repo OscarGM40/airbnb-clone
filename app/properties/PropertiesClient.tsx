@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
-import Container from "../components/shared/Container";
-import Heading from "../components/shared/Heading";
+import Container from "../components/Container";
+import Heading from "../components/Heading";
 import { SafeListing, SafeUser } from "../types";
 
 interface PropertiesClientProps {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import Button from "../shared/Button";
+import Button from "../Button";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -28,7 +28,6 @@ const Modal = ({
   secondaryAction,
   secondaryActionLabel,
 }: ModalProps) => {
-  
   const [showModal, setShowModal] = useState(isOpen);
 
   useEffect(() => {

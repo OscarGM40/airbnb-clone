@@ -1,17 +1,16 @@
 "use client";
 
 import { SafeUser } from "@/app/types";
-import Container from "../shared/Container";
+import Container from "../Container";
 import Categories from "./Categories";
 import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
 
-interface NavbarProps{
+interface NavbarProps {
   currentUser?: SafeUser | null; // de nuevo fijate como el prisma db push me ha creado los tipos ya
 }
-const Navbar = ({ currentUser}: NavbarProps) => {
-
+const Navbar = ({ currentUser }: NavbarProps) => {
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
       <div className="py-4 border-b-[1px]">

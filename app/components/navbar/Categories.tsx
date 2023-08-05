@@ -1,5 +1,5 @@
 "use client";
-import Container from "../shared/Container";
+import Container from "../Container";
 import { TbBeach, TbMountain, TbPool } from "react-icons/tb";
 import { IoDiamond } from "react-icons/io5";
 import {
@@ -15,7 +15,7 @@ import {
 import { MdOutlineVilla } from "react-icons/md";
 import { FaSkiing } from "react-icons/fa";
 import { BsSnow } from "react-icons/bs";
-import CategoryBox from "../shared/CategoryBox";
+import CategoryBox from "../CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
 import { IconType } from "react-icons";
 

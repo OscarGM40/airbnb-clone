@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
 import qs from "query-string";
 import { formatISO } from "date-fns";
-import Heading from "../shared/Heading";
+import Heading from "../Heading";
 import Calendar from "../inputs/Calendar";
 import Counter from "../inputs/Counter";
 
@@ -35,7 +35,7 @@ const SearchModal = () => {
   });
 
   const Map = useMemo(() => {
-    return dynamic(() => import("../shared/Map"), { ssr: false });
+    return dynamic(() => import("../Map"), { ssr: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 

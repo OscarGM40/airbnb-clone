@@ -7,10 +7,10 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { useCallback, useState } from "react";
 import Modal from "./Modal";
-import Heading from "../shared/Heading";
+import Heading from "../Heading";
 import Input from "../inputs/Input";
 import { toast } from "react-hot-toast";
-import Button from "../shared/Button";
+import Button from "../Button";
 import { signIn } from "next-auth/react";
 import useLoginModal from "@/app/hooks/useLoginModal";
 
@@ -37,7 +37,7 @@ const RegisterModal = () => {
     axios
       .post("/api/register", data)
       .then(() => {
-        toast.success('User registered successfully')
+        toast.success("User registered successfully");
         registerModal.onClose();
         loginModal.onOpen();
       })
@@ -103,10 +103,7 @@ const RegisterModal = () => {
       <div className="text-neutral-500 text-center mt-4 font-light">
         <div className="flex flex-row gap-2 items-center justify-center ">
           <div>Already have an account?</div>
-          <div
-            onClick={toggle}
-            className="text-neutral-800 cursor-pointer hover:underline"
-          >
+          <div onClick={toggle} className="text-neutral-800 cursor-pointer hover:underline">
             Log in
           </div>
         </div>

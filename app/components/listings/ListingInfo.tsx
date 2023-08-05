@@ -2,11 +2,11 @@
 import { SafeUser } from "@/app/types";
 import { Category } from "../navbar/Categories";
 import useCountries from "@/app/hooks/useCountries";
-import Avatar from "../shared/Avatar";
+import Avatar from "../Avatar";
 import ListingCategory from "./ListingCategory";
 import dynamic from "next/dynamic";
 
-const Map = dynamic(() => import("../shared/Map"),{ssr:false});
+const Map = dynamic(() => import("../Map"), { ssr: false });
 
 interface ListingInfoProps {
   user: SafeUser | null;
@@ -51,9 +51,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         />
       )}
       <hr className="mt-2 mb-1" />
-      <div className="text-lg font-light text-neutral-500">
-        {description}
-      </div>
+      <div className="text-lg font-light text-neutral-500">{description}</div>
       <hr className="mt-2 mb-3" />
       <Map center={coordinates?.latlng} />
     </div>

@@ -2,7 +2,7 @@
 import useRentModal from "@/app/hooks/useRentModal";
 import Modal from "./Modal";
 import { useCallback, useMemo, useState } from "react";
-import Heading from "../shared/Heading";
+import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -64,7 +64,7 @@ const RentModal = () => {
   // realmente sabemos que el Mapa depende del cambio de location, asi que no es innecesaria.Fijate que facil es hacer un import dinámico en Next,suputamadre,que prozh
   const Map = useMemo(
     () =>
-      dynamic(() => import("../shared/Map"), {
+      dynamic(() => import("../Map"), {
         ssr: false,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,11 +82,11 @@ const RentModal = () => {
 
   const onBack = useCallback(() => {
     setStep((value) => value - 1);
-  },[]);
-  
+  }, []);
+
   const onNext = useCallback(() => {
     setStep((value) => value + 1);
-  },[]);
+  }, []);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     if (step !== STEPS.PRICE) return onNext();

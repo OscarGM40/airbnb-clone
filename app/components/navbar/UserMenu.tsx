@@ -1,11 +1,10 @@
 "use client";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
-import { User } from "@prisma/client";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
-import Avatar from "../shared/Avatar";
+import Avatar from "../Avatar";
 import MenuItem from "./MenuItem";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";

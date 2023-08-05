@@ -5,8 +5,8 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import Button from "../shared/Button";
-import HeartButton from "../shared/HeartButton";
+import Button from "../Button";
+import HeartButton from "../HeartButton";
 
 interface ListingCardProps {
   // son los putos tipos de la Entidad,wow

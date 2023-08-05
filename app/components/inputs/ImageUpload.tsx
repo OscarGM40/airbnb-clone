@@ -66,7 +66,3 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value }) => {
 };
 
 export default ImageUpload;
-
-type Persona = {
-  name: string;
-} & ({ gender: "male"; salary: number } | { gender: "female"; age: number });
