@@ -598,4 +598,58 @@ export default async function getFavoriteListings(){
   }
 }
 
-7h40m
+8h00m: Fijate que approach tan interesante(y no es complicado) que ha usado montando una URL mediante el uso de la libreria query-string y varios estados:
+
+const onSubmit = useCallback( async () => {
+  let currentQuery = {};
+  if(params){ <- si hay parametros los pasamos a objeto(qs.parse)
+    currentQuery = qs.parse(params.toString())
+  }
+  le añadimos los estados con valores siempre
+    const updatedQuery: any = {
+      ...currentQuery,
+      locationValue: location?.value,
+      guestCount,
+      roomCount,
+      bathroomCount,
+    };
+    le añadimos los estados opcionales.Como son date las parseamso
+    if (dateRange.startDate) {
+      // formatISO es de la libreria date-fns
+      updatedQuery.startDate = formatISO(dateRange.startDate);
+    }
+    if (dateRange.endDate) {
+      // formatISO es de la libreria date-fns
+      updatedQuery.endDate = formatISO(dateRange.endDate);
+    }
+    formamos la url con qs.stringifyUrl(que va a pedir un objeto que tenemos ya)Importante el skipNull a true que si no los manda.
+
+    const url = qs.stringifyUrl(
+      {
+        url: "/",
+        query: updatedQuery,
+      },
+      { skipNull: true },
+    );
+    setStep(STEPS.LOCATION);
+    searchModal.onClose();
+    router.push(url);
+},[])
+
+Esto o lo hago con librerias como qs o con utilities.Y fijate como la primera linea del onSubmit va en conjunción con la actionLabel dinámica:
+const onSubmit = useCallback(async () => {
+    // fijate que esto es bastante interesante,si no es el ultimo paso que avance simplemente, lo hicimos asi?
+    if (step !== STEPS.INFO) {
+      return onNext();
+    }
+
+  const actionLabel = useMemo(() => {
+    if (step === STEPS.INFO) {
+      return "Search";
+    }
+    return "Next";
+  }, [step]);
+
+Bravo, más fácil imposible.
+
+8h12m making the last step of SearchModal

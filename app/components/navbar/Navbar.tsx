@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@prisma/client";
+import { SafeUser } from "@/app/types";
 import Container from "../shared/Container";
 import Categories from "./Categories";
 import Logo from "./Logo";
@@ -8,7 +8,7 @@ import Search from "./Search";
 import UserMenu from "./UserMenu";
 
 interface NavbarProps{
-  currentUser?: User | null; // de nuevo fijate como el prisma db push me ha creado los tipos ya
+  currentUser?: SafeUser | null; // de nuevo fijate como el prisma db push me ha creado los tipos ya
 }
 const Navbar = ({ currentUser}: NavbarProps) => {
 

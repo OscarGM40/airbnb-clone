@@ -9,9 +9,10 @@ import Avatar from "../shared/Avatar";
 import MenuItem from "./MenuItem";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";
+import { SafeUser } from "@/app/types";
 
 interface UserMenuProps {
-  currentUser?: User | null;
+  currentUser?: SafeUser | null;
 }
 const UserMenu = ({ currentUser }: UserMenuProps) => {
   const router = useRouter();
@@ -59,7 +60,7 @@ const UserMenu = ({ currentUser }: UserMenuProps) => {
                 <MenuItem onClick={() => router.push(`/trips`)} label="My trips" />
                 <MenuItem onClick={() => router.push(`/favorites`)} label="My favorites" />
                 <MenuItem onClick={() => router.push("/reservations")} label="My reservations" />
-                <MenuItem onClick={() => null} label="My properties" />
+                <MenuItem onClick={() => router.push("/properties")} label="My properties" />
                 <MenuItem onClick={rentModal.onOpen} label="Airbnb my home (Register a property)" />
                 <hr />
                 <MenuItem onClick={() => signOut()} label="Logout" />

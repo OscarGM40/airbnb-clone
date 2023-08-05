@@ -10,7 +10,6 @@ export async function DELETE(
   // entiendo que desectructuramos porque es req.params ??
   { params }: { params: IParams },
 ) {
-  console.log({ request });
   // fijate que es llamada a proceso asincrono dentro de una funcion
   const currentUser = await getCurrentUser();
   if (!currentUser) {

@@ -1,7 +1,7 @@
 "use client";
 import useRentModal from "@/app/hooks/useRentModal";
 import Modal from "./Modal";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Heading from "../shared/Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
@@ -80,12 +80,13 @@ const RentModal = () => {
     });
   };
 
-  const onBack = () => {
+  const onBack = useCallback(() => {
     setStep((value) => value - 1);
-  };
-  const onNext = () => {
+  },[]);
+  
+  const onNext = useCallback(() => {
     setStep((value) => value + 1);
-  };
+  },[]);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     if (step !== STEPS.PRICE) return onNext();

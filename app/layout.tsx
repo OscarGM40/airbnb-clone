@@ -7,6 +7,7 @@ import ToasterProvider from "./providers/ToasterProvider";
 import LoginModal from "./components/modals/LoginModal";
 import getCurrentUser from "./actions/getCurrentUser";
 import RentModal from "./components/modals/RentModal";
+import SearchModal from "./components/modals/SearchModal";
 
 // puedo importar,configurar y establecer una fuente de forma global facilmente en Next 13
 const font = Nunito({ subsets: ["latin"] });
@@ -29,6 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* fijate que fácil es crear un HOC para asegurarme que un componente se monta solo en el segundo render,evitando posibles problemas de hidratación */}
         {/* <ClientOnly> */}
         <ToasterProvider />
+        <SearchModal />
         <RentModal />
         <RegisterModal />
         <LoginModal />
