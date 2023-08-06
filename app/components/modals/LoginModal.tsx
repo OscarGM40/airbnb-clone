@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { AiFillGithub } from "react-icons/ai";
+// import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import Input from "../inputs/Input";
 import Button from "../Button";
@@ -87,12 +87,12 @@ const LoginModal = () => {
         icon={FcGoogle}
         onClick={() => signIn("google")}
       />
-      <Button
+{/*       <Button
         outline
         label="Continue with Github"
         icon={AiFillGithub}
         onClick={() => signIn("github")}
-      />
+      /> */}
       <div className="text-neutral-500 text-center mt-4 font-light">
         <div className="flex flex-row gap-2 items-center justify-center ">
           <div>First time using Airbnb?</div>
